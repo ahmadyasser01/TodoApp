@@ -27,6 +27,15 @@ export const getTask = asyncHandler(async (req,res,next)=>{
     return res.status(200).json(task);
 });
 
+export const getAllTasks = asyncHandler(async (req,res,next)=>{
+    const user = req.user;
+    const task = await Task.find({owner:user._id});
+
+    if(!task) throw new Error("No task found");
+
+    return res.status(200).json(task);
+});
+
 
 export const deleteTask = asyncHandler(async (req,res,next)=>{
     const {id} = req.params;
