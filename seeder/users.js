@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { MongoClient } from 'mongodb'
+import bcrypt from 'bcryptjs'
 
 const url = 'mongodb://127.0.0.1:27017';
 
@@ -8,19 +9,25 @@ const client = new MongoClient(url);
 // Database Name
 const dbName = 'test';
 
-function createRandomUser() {
+async function hashPassword(password){
+   return await bcrypt.hash(password,12);
+}
+async function createRandomUser() {
+    const hashedPassword = await hashPassword("123456789")
     return {
         username: faker.internet.userName(),
         email:faker.internet.email(),
-        password: faker.internet.password(),
+        password:hashedPassword ,
     }
 }
 
-function createUsers(n) {
+async function createUsers(n) {
     const users = []
-    Array.from({ length: 10 }).forEach(() => {
-        users.push(createRandomUser());
-      });
+    for(let i=0;i<n;i++)
+    {
+        const user = await createRandomUser();
+        users.push(user);
+    }
       return users;
 }
 
@@ -30,8 +37,8 @@ async function main() {
     console.log('Connected successfully to server');
     const db = client.db('test');
     const collection = db.collection('users');
-    // await collection.drop();
-    const users = createUsers(10);
+    await collection.drop();
+    const users = await createUsers(10);
     console.log(users);
 
     await collection.insertMany(users);
