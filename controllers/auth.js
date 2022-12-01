@@ -12,7 +12,7 @@ const createToken = (id) =>{
 const sendToken = (user,statusCode,res)=>{
 
     const token = createToken(user._id);
-
+    user.password = undefined;
     return res.status(201).json({user,token})
 
 }

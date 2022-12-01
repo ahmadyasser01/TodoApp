@@ -16,6 +16,10 @@ app.use('/api/tasks',taskRouter);
 app.use('/api/users',userRouter)
 
 
+// app.use((err, req, res, next) => {
+//    return res.status(500).json({status:"fail",err:err})
+//   });
+
 connectDB(process.env.MONGODB_CONNECTION_URI)
 const PORT = process.env.PORT || 300
 app.listen(PORT,()=>{
