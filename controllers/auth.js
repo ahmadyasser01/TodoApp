@@ -67,7 +67,7 @@ export const protect = asyncHandler(async(req,res,next)=>{
         throw new Error("You ARE NOT LOGGED IN  PLEASE LOGIN AND TRY AGAIN");
     }
     // VERIFY JWT TOKEN;
-    const decoded = await promisify(jwt.verify)(token,process.env.JWT_SECRET);
+    const decoded = await promisify(jwt.verify)(token,process.env.JWT_TOKEN);
 
     // GET USER BY DECODED ID 
     const currentUser = await User.findById(decoded.id);
