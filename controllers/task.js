@@ -4,12 +4,12 @@ import { checkEmptyObject, filterObj } from "../utils/filterObject.js";
 
 
 export const createTask = asyncHandler(async (req,res,next) =>{
-    console.log(req)
     const {title,description} = req.body;
-
+    const user = req.user;
     const newTask = await Task.create({
         title,
         description,
+        owner:user._id
     })
     if (!newTask) 
          throw new Error('Error creating new task')
@@ -19,8 +19,8 @@ export const createTask = asyncHandler(async (req,res,next) =>{
 
 export const getTask = asyncHandler(async (req,res,next)=>{
     const {id} = req.params;
-
-    const task = await Task.find({_id:id});
+    const user = req.user;
+    const task = await Task.findOne({owner:user._id,_id:id});
 
     if(!task) throw new Error("No task found");
 
@@ -30,8 +30,8 @@ export const getTask = asyncHandler(async (req,res,next)=>{
 
 export const deleteTask = asyncHandler(async (req,res,next)=>{
     const {id} = req.params;
-
-    const task = await Task.findOneAndDelete({_id:id});
+    const user = req.user;
+    const task = await Task.findOneAndDelete({_id:id,owner:user._id});
 
     if(!task) throw new Error("No task found");
 
@@ -41,11 +41,11 @@ export const deleteTask = asyncHandler(async (req,res,next)=>{
 export const updateTask = asyncHandler(async(req,res,nex)=>{
 
     const {id} = req.params;
-
+    const user = req.user;
     const filteredBody = filterObj(req.body, 'title',"description");
     if(checkEmptyObject(filteredBody)) throw new Error('No updates found');
 
-    const updatedTask =  await  Task.findOneAndUpdate({_id:id}, filteredBody, {
+    const updatedTask =  await  Task.findOneAndUpdate({_id:id,owner:user._id}, filteredBody, {
             new: true,
             runValidators: true
         });
