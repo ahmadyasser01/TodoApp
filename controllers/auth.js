@@ -54,3 +54,31 @@ export const login = asyncHandler(async (req,res,next)=>{
     return sendToken(user,201,res);
 
 })
+
+export const protect = asyncHandler(async(req,res,next)=>{
+    let token;
+
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token = req.headers.authorization.split(' ')[1];
+    }
+    // check if no token 
+    if(!token)
+    {
+        throw new Error("You ARE NOT LOGGED IN  PLEASE LOGIN AND TRY AGAIN");
+    }
+    // VERIFY JWT TOKEN;
+    const decoded = await promisify(jwt.verify)(token,process.env.JWT_SECRET);
+
+    // GET USER BY DECODED ID 
+    const currentUser = await User.findById(decoded.id);
+    // IF NO USER FOUND THROW ERROR
+    if(!currentUser)
+    {
+        throw new Error("No such user");
+    }
+
+     // ADD USER TO REQUEST
+     req.user = currentUser;
+     // IF NO ERROR UP TILL NOW THEN PASSED AND GO TO NEXT MIDDLEWARE
+     next(); 
+})
